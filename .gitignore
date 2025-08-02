@@ -1,0 +1,12 @@
+echo "node_modules/
+.env
+uploads/
+dist/
+build/
+.vscode/
+frontend/node_modules/
+frontend/build/
+frontend/.env
+backend/node_modules/
+backend/.env
+" > .gitignore
