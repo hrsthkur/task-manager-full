@@ -5,13 +5,16 @@ exports.createTask = async (req, res) => {
   try {
     const { title, description, dueDate, priority, status } = req.body;
 
+    const documents = req.files?.map(file => file.path); 
+
     const task = new Task({
       title,
       description,
       dueDate,
       priority,
       status,
-      assignedTo: req.user._id  
+      assignedTo: req.user._id,
+      documents  
     });
 
     await task.save();

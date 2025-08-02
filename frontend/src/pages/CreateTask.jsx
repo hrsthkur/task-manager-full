@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import axios from '../utils/axios';
 import { useNavigate } from 'react-router-dom';
 
+
+
+
 const CreateTask = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -11,7 +14,7 @@ const CreateTask = () => {
     priority: 'medium',
     status: 'pending'
   });
-
+const [files, setFiles] = useState([]);
   const [error, setError] = useState('');
 
   const handleChange = (e) => {
@@ -21,17 +24,35 @@ const CreateTask = () => {
     });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError('');
 
-    try {
-      await axios.post('/tasks', formData);
-      navigate('/dashboard');
-    } catch (err) {
-      setError(err.response?.data?.msg || 'Task creation failed');
-    }
-  };
+  const formPayload = new FormData();
+  formPayload.append('title', formData.title);
+  formPayload.append('description', formData.description);
+  formPayload.append('dueDate', formData.dueDate);
+  formPayload.append('priority', formData.priority);
+  formPayload.append('status', formData.status);
+
+  // Append PDFs
+  for (let i = 0; i < files.length; i++) {
+    formPayload.append('documents', files[i]);
+  }
+
+  try {
+    await axios.post('/tasks', formPayload, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    navigate('/dashboard');
+  } catch (err) {
+    setError(err.response?.data?.msg || 'Task creation failed');
+  }
+};
+
+
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
@@ -90,6 +111,15 @@ const CreateTask = () => {
             <option value="in progress">In Progress</option>
             <option value="completed">Completed</option>
           </select>
+            <input
+  type="file"
+  name="documents"
+  accept="application/pdf"
+  multiple
+  onChange={(e) => setFiles(e.target.files)}
+  className="w-full border p-2 rounded"
+/>
+
 
           <button
             type="submit"
